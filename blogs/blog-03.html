@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Production-Ready APIs with FastAPI — MB</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script>(function(){var t=localStorage.getItem('mb-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="main-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">MB</div>
+    <div class="sidebar-hr"></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item"        href="../index.html#home">    <span class="nav-prefix">~/</span>Root</a>
+      <a class="nav-item"        href="../index.html#about">   <span class="nav-prefix">./</span>Profile</a>
+      <a class="nav-item"        href="../index.html#projects"><span class="nav-prefix">./</span>Work</a>
+      <a class="nav-item active" href="../index.html#blogs">   <span class="nav-prefix">./</span>Logs</a>
+      <a class="nav-item"        href="../index.html#gallery"> <span class="nav-prefix">./</span>Gallery</a>
+      <a class="nav-item"        href="../index.html#contact"> <span class="nav-prefix">$</span>Ping</a>
+    </nav>
+    <div class="sidebar-footer">v1.0</div>
+  </aside>
+
+  <div class="main-area">
+    <header class="navbar">
+      <div class="navbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="navbar-page">./logs/blog-03</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle">[ light ]</button>
+    </header>
+
+    <main class="page-content">
+
+      <a class="back-nav" href="../index.html#blogs">
+        <span class="back-arrow">←</span> Logs
+      </a>
+
+      <div class="post-meta">
+        <span class="post-date">Jan 2025</span>
+        <span class="post-badge">Dev</span>
+      </div>
+
+      <div class="term-cmd">
+        <span class="term-prompt">$</span>
+        <span class="term-text">cat blog-03.md</span>
+      </div>
+
+      <h1 class="post-title">Building Production-Ready APIs with FastAPI</h1>
+      <div class="post-divider"></div>
+
+      <article class="post-body">
+
+        <p>
+          FastAPI has become my default choice for Python APIs. It's fast (ASGI, async-native),
+          has automatic OpenAPI docs, and the type-annotation-based validation via Pydantic catches
+          errors at the schema level before they reach your business logic. Here are the patterns
+          I've settled on after shipping a few real projects.
+        </p>
+
+        <h2>Project structure that scales</h2>
+
+        <pre><code>app/
+├── main.py          # FastAPI app creation, middleware, router registration
+├── api/
+│   ├── v1/
+│   │   ├── routes/  # One file per domain (users.py, items.py, ...)
+│   │   └── deps.py  # Shared dependencies (db session, current user, ...)
+├── core/
+│   ├── config.py    # Settings via pydantic-settings
+│   └── security.py  # Auth helpers
+├── models/          # SQLAlchemy ORM models
+├── schemas/         # Pydantic request/response schemas
+└── services/        # Business logic, decoupled from routes</code></pre>
+
+        <p>
+          Keeping routes thin — they should only validate input, call a service, and return a schema —
+          makes the codebase much easier to test and maintain.
+        </p>
+
+        <h2>Configuration with pydantic-settings</h2>
+
+        <pre><code>from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    DATABASE_URL: str
+    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    class Config:
+        env_file = ".env"
+
+settings = Settings()</code></pre>
+
+        <p>
+          This gives you environment variable loading, type validation, and IDE autocomplete for free.
+          Never <code>os.getenv()</code> directly in your route handlers.
+        </p>
+
+        <h2>Async where it matters</h2>
+
+        <p>
+          Use <code>async def</code> for I/O-bound routes (DB queries, HTTP calls to external services).
+          For CPU-bound work (like running an ML model), use <code>def</code> — FastAPI will run it in
+          a thread pool automatically. Mixing the two correctly matters for throughput under load.
+        </p>
+
+        <h2>Error handling</h2>
+
+        <pre><code>from fastapi import HTTPException
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request, exc):
+    return JSONResponse(status_code=422, content={"detail": str(exc)})</code></pre>
+
+        <p>
+          Register custom exception handlers at the app level rather than scattering try/except
+          through every route. Your routes stay clean, and error responses stay consistent.
+        </p>
+
+        <blockquote>
+          <p>The schema is the contract. Define it precisely and let Pydantic enforce it — don't validate manually inside routes.</p>
+        </blockquote>
+
+        <h2>Quick wins</h2>
+
+        <ul>
+          <li>Use <code>APIRouter</code> with <code>prefix</code> and <code>tags</code> to keep related routes grouped.</li>
+          <li>Use <code>Depends()</code> for DB sessions — it handles cleanup on both success and error.</li>
+          <li>Set <code>response_model</code> explicitly on every route to control what leaks out.</li>
+          <li>Add <code>lifespan</code> context for startup/shutdown logic (DB pool, model loading).</li>
+        </ul>
+
+      </article>
+    </main>
+  </div>
+
+</div>
+
+<script src="../js/theme.js"></script>
+<script src="../js/mobile-nav.js"></script>
+<script src="../js/blog-shell.js"></script>
+</body>
+</html>

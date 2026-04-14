@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MB — Bharadwaja Mavilla</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- Apply saved theme before paint to avoid flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('mb-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<div class="main-container">
+
+  <!-- ============================  SIDEBAR  ============================ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">MB</div>
+    <div class="sidebar-hr"></div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-item" data-page="home">
+        <span class="nav-prefix">~/</span>Root
+      </div>
+      <div class="nav-item" data-page="about">
+        <span class="nav-prefix">./</span>Profile
+      </div>
+      <div class="nav-item" data-page="projects">
+        <span class="nav-prefix">./</span>Work
+      </div>
+      <div class="nav-item" data-page="blogs">
+        <span class="nav-prefix">./</span>Logs
+      </div>
+      <div class="nav-item" data-page="gallery">
+        <span class="nav-prefix">./</span>Gallery
+      </div>
+      <div class="nav-item" data-page="contact">
+        <span class="nav-prefix">$</span>Ping
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">v1.0</div>
+  </aside>
+
+  <!-- ============================  MAIN AREA  ============================ -->
+  <div class="main-area">
+    <header class="navbar">
+      <div class="navbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="navbar-page" id="navbarPage">~/root</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle">[ light ]</button>
+    </header>
+
+    <main class="page-content" id="pageContent"></main>
+  </div>
+
+</div>
+
+<!-- ======================================================================
+     Scripts — order matters:
+     1. theme.js       (Theme object, needed before anything renders)
+     2. data/blogs.js  (BLOGS array, needed by logs.js)
+     3. pages/*.js     (populate the Pages object)
+     4. router.js      (Navigate object, calls Pages)
+     5. mobile-nav.js  (MobileNav, sets up hamburger)
+======================================================================= -->
+<script>
+  // Namespace for page renderers — populated by pages/*.js
+  const Pages = {};
+</script>
+
+<script src="js/theme.js"></script>
+<script src="data/blogs.js"></script>
+
+<script src="js/pages/home.js"></script>
+<script src="js/pages/about.js"></script>
+<script src="js/pages/projects.js"></script>
+<script src="js/pages/logs.js"></script>
+<script src="js/pages/gallery.js"></script>
+<script src="js/pages/contact.js"></script>
+
+<script src="js/router.js"></script>
+<script src="js/mobile-nav.js"></script>
+
+<script>
+  // Boot
+  Theme.init();
+  initRouter();
+  MobileNav.init();
+</script>
+
+</body>
+</html>

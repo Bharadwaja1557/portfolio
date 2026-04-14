@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Neural Networks: A Practical Introduction — MB</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script>(function(){var t=localStorage.getItem('mb-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="main-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">MB</div>
+    <div class="sidebar-hr"></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item"        href="../index.html#home">    <span class="nav-prefix">~/</span>Root</a>
+      <a class="nav-item"        href="../index.html#about">   <span class="nav-prefix">./</span>Profile</a>
+      <a class="nav-item"        href="../index.html#projects"><span class="nav-prefix">./</span>Work</a>
+      <a class="nav-item active" href="../index.html#blogs">   <span class="nav-prefix">./</span>Logs</a>
+      <a class="nav-item"        href="../index.html#gallery"> <span class="nav-prefix">./</span>Gallery</a>
+      <a class="nav-item"        href="../index.html#contact"> <span class="nav-prefix">$</span>Ping</a>
+    </nav>
+    <div class="sidebar-footer">v1.0</div>
+  </aside>
+
+  <div class="main-area">
+    <header class="navbar">
+      <div class="navbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="navbar-page">./logs/blog-04</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle">[ light ]</button>
+    </header>
+
+    <main class="page-content">
+
+      <a class="back-nav" href="../index.html#blogs">
+        <span class="back-arrow">←</span> Logs
+      </a>
+
+      <div class="post-meta">
+        <span class="post-date">Dec 2024</span>
+        <span class="post-badge">ML</span>
+      </div>
+
+      <div class="term-cmd">
+        <span class="term-prompt">$</span>
+        <span class="term-text">cat blog-04.md</span>
+      </div>
+
+      <h1 class="post-title">Graph Neural Networks: A Practical Introduction</h1>
+      <div class="post-divider"></div>
+
+      <article class="post-body">
+
+        <p>
+          Most real-world data isn't a grid or a sequence — it's a graph. Social networks,
+          molecular structures, citation networks, knowledge bases — all of these are naturally
+          represented as nodes and edges. Graph Neural Networks (GNNs) are the tool that
+          lets neural networks reason over this kind of data.
+        </p>
+
+        <h2>The message-passing framework</h2>
+
+        <p>
+          Almost all GNN architectures can be understood through the lens of message passing.
+          In each layer, every node <em>aggregates</em> information from its neighbours, then
+          <em>updates</em> its own representation based on that aggregated message.
+        </p>
+
+        <pre><code># Conceptually, one GNN layer for node v:
+h_v_new = UPDATE(h_v, AGGREGATE({h_u : u in N(v)}))</code></pre>
+
+        <p>
+          The choice of <code>AGGREGATE</code> (mean, sum, max, attention) and <code>UPDATE</code>
+          (MLP, GRU) distinguishes different architectures like GCN, GraphSAGE, and GAT.
+        </p>
+
+        <h2>Graph Convolutional Networks (GCN)</h2>
+
+        <p>
+          GCN (Kipf &amp; Welling, 2017) uses a normalised mean aggregation with a learned weight matrix:
+        </p>
+
+        <pre><code>H^(l+1) = sigma( D^(-1/2) A_hat D^(-1/2) H^(l) W^(l) )
+
+# A_hat = A + I  (adjacency + self-loops)
+# D     = degree matrix</code></pre>
+
+        <p>
+          This is fast and works well on homophilic graphs (where connected nodes tend to share labels),
+          but it treats all neighbours equally — a limitation addressed by GAT.
+        </p>
+
+        <h2>Getting started with PyTorch Geometric</h2>
+
+        <pre><code>import torch
+from torch_geometric.nn import GCNConv
+from torch_geometric.datasets import Planetoid
+
+dataset = Planetoid(root='/tmp/Cora', name='Cora')
+
+class GCN(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(dataset.num_features, 64)
+        self.conv2 = GCNConv(64, dataset.num_classes)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = self.conv1(x, edge_index).relu()
+        x = torch.dropout(x, p=0.5, train=self.training)
+        return self.conv2(x, edge_index)</code></pre>
+
+        <p>
+          PyTorch Geometric makes it easy to get started. The Cora citation dataset is the
+          classic benchmark — ~2700 nodes, 7 classes, and a transductive semi-supervised
+          node classification task.
+        </p>
+
+        <h2>When to use GNNs</h2>
+
+        <ul>
+          <li><strong>Node classification</strong> — predict a label for each node (e.g., paper category).</li>
+          <li><strong>Link prediction</strong> — predict whether an edge should exist (e.g., recommendation).</li>
+          <li><strong>Graph classification</strong> — predict a label for the whole graph (e.g., molecule property).</li>
+        </ul>
+
+        <blockquote>
+          <p>If your data has a natural relational structure, try a GNN before reaching for a flat feature vector approach.</p>
+        </blockquote>
+
+      </article>
+    </main>
+  </div>
+
+</div>
+
+<script src="../js/theme.js"></script>
+<script src="../js/mobile-nav.js"></script>
+<script src="../js/blog-shell.js"></script>
+</body>
+</html>

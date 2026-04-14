@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+  ══════════════════════════════════════════
+  HOW TO USE THIS TEMPLATE
+  ══════════════════════════════════════════
+  1. Copy this file → blogs/blog-XX.html
+  2. Update <title> below
+  3. Update .navbar-page text (the breadcrumb)
+  4. Update .post-date, .post-badge, .post-title
+  5. Write your content inside .post-body
+  6. Add entry to data/blogs.js (id, title, date, excerpt, tag, file)
+  ══════════════════════════════════════════
+  -->
+
+  <title>Blog Title — MB</title>  <!-- ← CHANGE THIS -->
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+
+  <!-- Apply saved theme before paint -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('mb-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<div class="main-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">MB</div>
+    <div class="sidebar-hr"></div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item"        href="../index.html#home">    <span class="nav-prefix">~/</span>Root</a>
+      <a class="nav-item"        href="../index.html#about">   <span class="nav-prefix">./</span>Profile</a>
+      <a class="nav-item"        href="../index.html#projects"><span class="nav-prefix">./</span>Work</a>
+      <a class="nav-item active" href="../index.html#blogs">   <span class="nav-prefix">./</span>Logs</a>
+      <a class="nav-item"        href="../index.html#gallery"> <span class="nav-prefix">./</span>Gallery</a>
+      <a class="nav-item"        href="../index.html#contact"> <span class="nav-prefix">$</span>Ping</a>
+    </nav>
+
+    <div class="sidebar-footer">v1.0</div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <header class="navbar">
+      <div class="navbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <!-- ↓ CHANGE the last segment to match your blog title/slug -->
+        <span class="navbar-page">./logs/blog-title</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle">[ light ]</button>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Back navigation -->
+      <a class="back-nav" href="../index.html#blogs">
+        <span class="back-arrow">←</span> Logs
+      </a>
+
+      <!-- Post header -->
+      <div class="post-meta">
+        <span class="post-date">Mon YYYY</span>   <!-- ← CHANGE: e.g. "Apr 2025" -->
+        <span class="post-badge">Tag</span>         <!-- ← CHANGE: e.g. "ML" / "Dev" / "Personal" -->
+      </div>
+
+      <div class="term-cmd">
+        <span class="term-prompt">$</span>
+        <span class="term-text">cat blog-title.md</span>  <!-- ← CHANGE to match your file name -->
+      </div>
+
+      <h1 class="post-title">Your Blog Title Here</h1>  <!-- ← CHANGE -->
+
+      <div class="post-divider"></div>
+
+      <!-- ══════════════════════════════════════════
+           YOUR BLOG CONTENT GOES BELOW
+           Supported elements: p, h2, h3, ul, ol,
+           code, pre>code, blockquote, strong, em, a, hr
+      ══════════════════════════════════════════ -->
+      <article class="post-body">
+
+        <p>Write your introduction paragraph here. This is the opening hook.</p>
+
+        <h2>Section Heading</h2>
+
+        <p>Write your content. You can use <strong>bold text</strong> and <em>italics</em>.
+        Links look like <a href="#">this</a>.</p>
+
+        <pre><code># Example code block
+def hello():
+    print("Hello, world!")</code></pre>
+
+        <blockquote>
+          <p>A blockquote looks like this — useful for highlighting key ideas.</p>
+        </blockquote>
+
+        <ul>
+          <li>Bullet point one</li>
+          <li>Bullet point two</li>
+          <li>Bullet point three</li>
+        </ul>
+
+        <h2>Another Section</h2>
+
+        <p>Continue writing here.</p>
+
+      </article>
+      <!-- ══════════════════════════════════════════ -->
+
+    </main>
+  </div>
+
+</div>
+
+<script src="../js/theme.js"></script>
+<script src="../js/mobile-nav.js"></script>
+<script src="../js/blog-shell.js"></script>
+
+</body>
+</html>
