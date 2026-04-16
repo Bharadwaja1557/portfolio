@@ -11,7 +11,7 @@
 
 Pages.about = function () {
   const books = [
-    { title: '',                 color: '#1b3a5e', cover: 'Machine Learning.webp' },
+    { title: 'Deep Learning',                 color: '#1b3a5e', cover: null },
     { title: 'CLRS Algorithms',               color: '#2b1b4a', cover: null },
     { title: 'Clean Code',                    color: '#1a4530', cover: null },
     { title: 'Pattern Recognition & ML',      color: '#4a1f20', cover: null },
@@ -59,8 +59,8 @@ Pages.about = function () {
       <div class="bcell b-photo">
         <div class="cell-lbl">photo</div>
         <div class="avatar">
-          <img src="assets/img/mb.jpeg" alt="Mavilla Bharadwaja"
-               onerror="this.style.display='none';this.parentElement.dataset.fallback='true';this.parentElement.textContent='MB'">
+          <img src="assets/img/mb.jpg" alt="Mavilla Bharadwaja"
+               onerror="this.style.display='none';this.parentElement.dataset.fallback='true';this.parentElement.textContent='BM'">
         </div>
         <div class="avatar-name">Mavilla Bharadwaja</div>
         <div class="avatar-role">MTech CSE @ IITK</div>

@@ -260,7 +260,7 @@ a { color: inherit; text-decoration: none; }
 .shelf { display: flex; gap: 0.85rem; overflow-x: auto; padding-bottom: 0.4rem; scrollbar-width: thin; scrollbar-color: var(--border-2) transparent; }
 .book { flex-shrink: 0; width: 74px; height: 112px; border-radius: 3px 5px 5px 3px; display: flex; align-items: flex-end; padding: 0.5rem 0.45rem 0.5rem 0.6rem; position: relative; overflow: hidden; transition: transform 0.2s; cursor: default; box-shadow: 3px 3px 8px var(--shadow), inset -2px 0 4px rgba(0,0,0,0.25); }
 .book:hover { transform: translateY(-5px) rotate(0.8deg); }
-/* .book-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: rgba(0,0,0,0.25); z-index: 1; } */
+.book-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: rgba(0,0,0,0.25); z-index: 1; }
 .book-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .book-title { font-size: 0.58rem; font-weight: 600; line-height: 1.3; color: rgba(255,255,255,0.88); text-shadow: 0 1px 3px rgba(0,0,0,0.6); position: relative; z-index: 2; }
 
@@ -302,12 +302,87 @@ a { color: inherit; text-decoration: none; }
 .type-note { border-color: rgba(152,195,121,0.3); color: var(--accent-green); }
 
 /* ============================================================
-   MEDIA PAGE
+   MEDIA PAGE — Pinterest/masonry layout
 ============================================================ */
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.7rem; }
-.gallery-slot { aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; transition: border-color 0.2s; }
-.gallery-slot:hover { border-color: var(--border-2); }
-.gallery-note { font-size: 0.74rem; color: var(--text-muted); margin-top: 1.5rem; letter-spacing: 0.08em; }
+
+/* CSS columns masonry — handles all aspect ratios naturally */
+.masonry-grid {
+  columns: 3 240px;       /* 3 columns, min 240px each */
+  column-gap: 0.75rem;
+}
+
+/* Each card breaks inside columns correctly */
+.media-card {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin-bottom: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  display: inline-block; /* required for column layout */
+  width: 100%;
+}
+.media-card:hover {
+  border-color: var(--border-2);
+  transform: translateY(-2px);
+}
+
+/* Image wrapper — flush to top, left, right edges, no padding */
+.media-img-wrap {
+  position: relative;
+  width: 100%;
+  display: block;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.media-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* The image sets its own height via natural aspect ratio */
+}
+
+/* Placeholder shown when image fails to load */
+.media-placeholder-inner {
+  display: none;
+  padding: 2.5rem 1rem;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-align: center;
+  word-break: break-all;
+}
+.media-card--placeholder .media-img { display: none; }
+.media-card--placeholder .media-placeholder-inner { display: block; }
+
+/* Caption + date — inside the card, below the image */
+.media-card-body {
+  padding: 0.7rem 0.85rem 0.8rem;
+}
+.media-caption {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.01em;
+}
+.media-date {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Mobile: fewer columns */
+@media (max-width: 768px) {
+  .masonry-grid { columns: 2 160px; column-gap: 0.55rem; }
+  .media-card   { margin-bottom: 0.55rem; }
+}
+@media (max-width: 380px) {
+  .masonry-grid { columns: 1; }
+}
 
 /* ============================================================
    CONTACT PAGE
