@@ -3,19 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MB — Bharadwaja Mavilla</title>
+  <title>MB — Mavilla Bharadwaja</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
-
   <!-- Apply saved theme before paint to avoid flash -->
-  <script>
-    (function () {
-      var t = localStorage.getItem('mb-theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+  <script>(function(){var t=localStorage.getItem('mb-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 
@@ -23,36 +17,39 @@
 
 <div class="main-container">
 
-  <!-- ============================  SIDEBAR  ============================ -->
+  <!-- ======================== SIDEBAR ======================== -->
   <aside class="sidebar">
     <div class="sidebar-logo">MB</div>
     <div class="sidebar-hr"></div>
 
     <nav class="sidebar-nav" id="sidebarNav">
       <div class="nav-item" data-page="home">
-        <span class="nav-prefix">~/</span>Root
+        <span class="nav-prefix">~/</span>root
       </div>
       <div class="nav-item" data-page="about">
-        <span class="nav-prefix">./</span>Profile
+        <span class="nav-prefix">./</span>profile
       </div>
-      <div class="nav-item" data-page="projects">
-        <span class="nav-prefix">./</span>Work
+      <div class="nav-item" data-page="work">
+        <span class="nav-prefix">./</span>work
       </div>
-      <div class="nav-item" data-page="blogs">
-        <span class="nav-prefix">./</span>Logs
+      <div class="nav-item" data-page="logs">
+        <span class="nav-prefix">./</span>logs
       </div>
-      <div class="nav-item" data-page="gallery">
-        <span class="nav-prefix">./</span>Gallery
+      <div class="nav-item" data-page="media">
+        <span class="nav-prefix">./</span>media
       </div>
       <div class="nav-item" data-page="contact">
-        <span class="nav-prefix">$</span>Ping
+        <span class="nav-prefix">$</span>ping
+      </div>
+      <div class="nav-item" data-page="site">
+        <span class="nav-prefix">$</span>site
       </div>
     </nav>
 
     <div class="sidebar-footer">v1.0</div>
   </aside>
 
-  <!-- ============================  MAIN AREA  ============================ -->
+  <!-- ======================== MAIN AREA ======================== -->
   <div class="main-area">
     <header class="navbar">
       <div class="navbar-left">
@@ -65,38 +62,38 @@
     </header>
 
     <main class="page-content" id="pageContent"></main>
+    <!-- footer injected here by router.js on each navigation -->
   </div>
 
 </div>
 
-<!-- ======================================================================
-     Scripts — order matters:
-     1. theme.js       (Theme object, needed before anything renders)
-     2. data/blogs.js  (BLOGS array, needed by logs.js)
-     3. pages/*.js     (populate the Pages object)
-     4. router.js      (Navigate object, calls Pages)
-     5. mobile-nav.js  (MobileNav, sets up hamburger)
-======================================================================= -->
-<script>
-  // Namespace for page renderers — populated by pages/*.js
-  const Pages = {};
-</script>
+<!-- =============================================================
+     Script load order:
+     1. theme.js        — Theme object (needs to run before render)
+     2. data/logs.js    — LOGS array
+     3. data/projects.js — PROJECTS array
+     4. pages/*.js      — populate Pages object
+     5. router.js       — navigate()
+     6. mobile-nav.js   — MobileNav
+============================================================== -->
+<script>const Pages = {};</script>
 
 <script src="js/theme.js"></script>
-<script src="data/blogs.js"></script>
+<script src="data/logs.js"></script>
+<script src="data/projects.js"></script>
 
 <script src="js/pages/home.js"></script>
 <script src="js/pages/about.js"></script>
-<script src="js/pages/projects.js"></script>
+<script src="js/pages/work.js"></script>
 <script src="js/pages/logs.js"></script>
-<script src="js/pages/gallery.js"></script>
+<script src="js/pages/media.js"></script>
 <script src="js/pages/contact.js"></script>
+<script src="js/pages/site.js"></script>
 
 <script src="js/router.js"></script>
 <script src="js/mobile-nav.js"></script>
 
 <script>
-  // Boot
   Theme.init();
   initRouter();
   MobileNav.init();

@@ -1,77 +1,94 @@
 /**
- * js/router.js — Hash-based SPA router for index.html
- *
- * URL scheme: index.html#home, index.html#about, etc.
- * Browser back/forward buttons work automatically via hashchange.
+ * js/router.js — hash-based SPA router
+ * URL scheme: index.html#home, #about, #work, #logs, #media, #contact, #site
  */
 
 const PAGE_META = {
-  home:     { cmd: '~/root',      label: 'Root' },
-  about:    { cmd: './profile',   label: 'Profile' },
-  projects: { cmd: './work',      label: 'Work' },
-  blogs:    { cmd: './logs',      label: 'Logs' },
-  gallery:  { cmd: './gallery',   label: 'Gallery' },
-  contact:  { cmd: '$ ping me',   label: 'Ping' },
+  home:    { cmd: '~/root',      label: 'root'    },
+  about:   { cmd: './profile',   label: 'profile' },
+  work:    { cmd: './work',      label: 'work'    },
+  logs:    { cmd: './logs',      label: 'logs'    },
+  media:   { cmd: './media',     label: 'media'   },
+  contact: { cmd: '$ ping me',   label: 'ping'    },
+  site:    { cmd: '$ man site',  label: 'site'    },
 };
+
+const FOOTER_HTML = `
+  <footer class="site-footer">
+    <span class="footer-copy">© ${new Date().getFullYear()} Mavilla Bharadwaja</span>
+    <span class="footer-right">
+      <a href="mailto:bharadwaja1557@gmail.com">mail</a>
+      <a href="https://github.com/mb1557" target="_blank" rel="noopener">github</a>
+      <a href="https://linkedin.com/in/bharadwaja1557/" target="_blank" rel="noopener">linkedin</a>
+    </span>
+  </footer>
+`;
 
 function navigate(page) {
   if (!PAGE_META[page] || !Pages[page]) return;
 
-  // Sync URL hash (without triggering hashchange again)
   if (window.location.hash !== `#${page}`) {
     history.pushState(null, '', `#${page}`);
   }
 
-  // Update sidebar active state
-  document.querySelectorAll('.nav-item').forEach(el =>
+  // Sidebar active
+  document.querySelectorAll('.nav-item[data-page]').forEach(el =>
     el.classList.toggle('active', el.dataset.page === page)
   );
 
-  // Update navbar breadcrumb
+  // Navbar breadcrumb
   document.getElementById('navbarPage').textContent = PAGE_META[page].cmd;
 
   // Re-trigger animation
   const content = document.getElementById('pageContent');
   content.style.animation = 'none';
-  content.offsetHeight; // reflow
+  content.offsetHeight;
   content.style.animation = '';
 
-  // Render page
-  content.innerHTML = Pages[page]();
+  // Render page + footer
+  const mainArea = document.querySelector('.main-area');
+  const existingFooter = mainArea.querySelector('.site-footer');
+  if (existingFooter) existingFooter.remove();
 
-  // Scroll to top
+  content.innerHTML = Pages[page]();
+  mainArea.insertAdjacentHTML('beforeend', FOOTER_HTML);
+
+  // Run page-specific init if it exists
+  if (typeof Pages[page].init === 'function') {
+    Pages[page].init();
+  }
+
   window.scrollTo({ top: 0 });
 }
 
 function initRouter() {
-  // Theme toggle button
+  // Theme toggle
   const btn = document.getElementById('themeToggle');
   btn.addEventListener('click', () => {
     const next = Theme.toggle();
     btn.textContent = next === 'dark' ? '[ light ]' : '[ dark ]';
   });
-  // Reflect current theme on button
   btn.textContent = Theme.get() === 'dark' ? '[ light ]' : '[ dark ]';
 
   // Sidebar nav clicks
   document.getElementById('sidebarNav').addEventListener('click', e => {
-    const item = e.target.closest('.nav-item');
+    const item = e.target.closest('.nav-item[data-page]');
     if (item?.dataset.page) navigate(item.dataset.page);
   });
 
-  // Quick-link buttons inside page content (delegated)
+  // Delegated quick-link buttons (data-goto) inside page content
   document.getElementById('pageContent').addEventListener('click', e => {
-    const btn = e.target.closest('[data-goto]');
-    if (btn?.dataset.goto) navigate(btn.dataset.goto);
+    const el = e.target.closest('[data-goto]');
+    if (el?.dataset.goto) navigate(el.dataset.goto);
   });
 
-  // Browser back / forward
+  // Browser back/forward
   window.addEventListener('popstate', () => {
     const page = window.location.hash.replace('#', '') || 'home';
     navigate(page);
   });
 
-  // Initial page from URL hash
+  // Initial load
   const initial = window.location.hash.replace('#', '') || 'home';
   navigate(initial);
 }

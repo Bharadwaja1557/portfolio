@@ -29,7 +29,7 @@ Pages.contact = function () {
       <span class="term-prompt">$</span>
       <span class="term-text">ping me</span>
     </div>
-    <div class="page-heading">Contact</div>
+    <div class="page-heading">ping</div>
     <div class="contact-list">${rows}</div>
     <p class="contact-note">// feel free to reach out through any of these channels</p>
   `;

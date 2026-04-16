@@ -11,24 +11,23 @@
   <script>(function(){var t=localStorage.getItem('mb-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
-
+<button class="reader-exit">&#x2715; exit reader</button>
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="main-container">
-
   <aside class="sidebar">
     <div class="sidebar-logo">MB</div>
     <div class="sidebar-hr"></div>
     <nav class="sidebar-nav">
-      <a class="nav-item"        href="../index.html#home">    <span class="nav-prefix">~/</span>Root</a>
-      <a class="nav-item"        href="../index.html#about">   <span class="nav-prefix">./</span>Profile</a>
-      <a class="nav-item"        href="../index.html#projects"><span class="nav-prefix">./</span>Work</a>
-      <a class="nav-item active" href="../index.html#blogs">   <span class="nav-prefix">./</span>Logs</a>
-      <a class="nav-item"        href="../index.html#gallery"> <span class="nav-prefix">./</span>Gallery</a>
-      <a class="nav-item"        href="../index.html#contact"> <span class="nav-prefix">$</span>Ping</a>
+      <a class="nav-item"        href="../index.html#home">   <span class="nav-prefix">~/</span>root</a>
+      <a class="nav-item"        href="../index.html#about">  <span class="nav-prefix">./</span>profile</a>
+      <a class="nav-item"        href="../index.html#work">   <span class="nav-prefix">./</span>work</a>
+      <a class="nav-item active" href="../index.html#logs">   <span class="nav-prefix">./</span>logs</a>
+      <a class="nav-item"        href="../index.html#media">  <span class="nav-prefix">./</span>media</a>
+      <a class="nav-item"        href="../index.html#contact"><span class="nav-prefix">$</span>ping</a>
+      <a class="nav-item"        href="../index.html#site">   <span class="nav-prefix">$</span>site</a>
     </nav>
     <div class="sidebar-footer">v1.0</div>
   </aside>
-
   <div class="main-area">
     <header class="navbar">
       <div class="navbar-left">
@@ -39,106 +38,52 @@
       </div>
       <button class="theme-toggle" id="themeToggle">[ light ]</button>
     </header>
-
     <main class="page-content">
-
-      <a class="back-nav" href="../index.html#blogs">
-        <span class="back-arrow">←</span> Logs
-      </a>
-
+      <a class="back-nav" href="../index.html#logs"><span class="back-arrow">&#x2190;</span> logs</a>
       <div class="post-meta">
         <span class="post-date">Mar 2025</span>
         <span class="post-badge">ML</span>
+        <button class="reader-toggle">reader mode</button>
       </div>
-
       <div class="term-cmd">
         <span class="term-prompt">$</span>
         <span class="term-text">cat blog-01.md</span>
       </div>
-
       <h1 class="post-title">Understanding Attention Mechanisms in Transformers</h1>
       <div class="post-divider"></div>
-
       <article class="post-body">
-
-        <p>
-          Attention is the core innovation that made Transformers possible — and understanding it
-          deeply is key to working with any modern language or vision model. In this post, I'll walk
-          through the mechanics of scaled dot-product attention from scratch, explain why positional
-          encoding matters, and build intuition for what "multi-head" actually means.
-        </p>
-
-        <h2>The core idea</h2>
-
-        <p>
-          At its heart, attention answers a simple question: <em>given a query, which parts of the
-          input are most relevant?</em> Each token produces three vectors — a <strong>Query (Q)</strong>,
-          a <strong>Key (K)</strong>, and a <strong>Value (V)</strong> — through learned linear projections.
-          The output for each token is a weighted sum of all the value vectors, where the weights come
-          from how well that token's query matches each key.
-        </p>
-
-        <h2>Scaled dot-product attention</h2>
-
-        <p>The formula is deceptively simple:</p>
-
-        <pre><code>Attention(Q, K, V) = softmax( QK^T / sqrt(d_k) ) · V</code></pre>
-
-        <p>
-          The dot product <code>QK^T</code> measures similarity between all query-key pairs simultaneously.
-          We scale by <code>sqrt(d_k)</code> to prevent the dot products from growing large in high dimensions,
-          which would push the softmax into regions with very small gradients. The softmax then turns these
-          scores into a probability distribution, and we take the weighted sum of the values.
-        </p>
-
-        <h2>Why multi-head?</h2>
-
-        <p>
-          A single attention head learns one way to relate tokens. Multi-head attention runs several
-          attention operations in parallel on projected subspaces of the input, then concatenates the
-          results. This lets the model simultaneously attend to different types of relationships —
-          syntactic, semantic, positional — within the same layer.
-        </p>
-
-        <pre><code>MultiHead(Q, K, V) = Concat(head_1, ..., head_h) W^O
-
-where head_i = Attention(Q W_i^Q, K W_i^K, V W_i^V)</code></pre>
-
-        <h2>Position matters</h2>
-
-        <p>
-          Attention itself is permutation-invariant — it doesn't inherently know the order of tokens.
-          Positional encodings (either sinusoidal or learned) inject sequence position information by
-          adding a position-specific vector to each token embedding before feeding it to the attention layers.
-        </p>
-
-        <blockquote>
-          <p>
-            Without positional encodings, a Transformer would produce the same output regardless of
-            whether you fed it "dog bites man" or "man bites dog".
-          </p>
-        </blockquote>
-
-        <h2>Takeaways</h2>
-
-        <ul>
-          <li>Attention lets every token directly interact with every other token in O(n²) time.</li>
-          <li>Scaling prevents vanishing gradients in high-dimensional spaces.</li>
-          <li>Multiple heads capture different relationship types in parallel.</li>
-          <li>Position encodings are essential for order awareness.</li>
-        </ul>
-
-        <p>
-          In the next post, I'll explore how self-attention in BERT differs from the causal (masked)
-          attention used in GPT-style models — and why that distinction matters for downstream tasks.
-        </p>
-
+<p>Attention is the core innovation that made Transformers possible. In this post I walk through scaled dot-product attention from scratch, explain why positional encoding matters, and build intuition for what "multi-head" actually means.</p>
+<h2>The core idea</h2>
+<p>Each token produces three vectors — a <strong>Query (Q)</strong>, a <strong>Key (K)</strong>, and a <strong>Value (V)</strong> — through learned linear projections. The output for each token is a weighted sum of all value vectors, where the weights come from how well that token's query matches each key.</p>
+<h2>Scaled dot-product attention</h2>
+<pre><code>Attention(Q, K, V) = softmax( QK^T / sqrt(d_k) ) · V</code></pre>
+<p>We scale by <code>sqrt(d_k)</code> to prevent large dot products from pushing softmax into regions with tiny gradients. The softmax turns scores into a probability distribution; we take the weighted sum of values.</p>
+<h2>Why multi-head?</h2>
+<p>A single head learns one way to relate tokens. Multi-head attention runs several operations in parallel on projected subspaces, then concatenates results — letting the model simultaneously attend to syntactic, semantic, and positional relationships.</p>
+<pre><code>MultiHead(Q,K,V) = Concat(head_1,...,head_h) W^O
+where  head_i = Attention(Q W_i^Q, K W_i^K, V W_i^V)</code></pre>
+<h2>Position matters</h2>
+<p>Attention is permutation-invariant — it does not inherently know token order. Positional encodings inject sequence position by adding a position-specific vector to each token embedding before the attention layers.</p>
+<blockquote><p>Without positional encodings, a Transformer produces the same output for "dog bites man" and "man bites dog".</p></blockquote>
+<h2>Takeaways</h2>
+<ul>
+<li>Attention lets every token directly interact with every other in O(n²) time.</li>
+<li>Scaling prevents vanishing gradients in high-dimensional spaces.</li>
+<li>Multiple heads capture different relationship types in parallel.</li>
+<li>Position encodings are essential for order awareness.</li>
+</ul>
       </article>
     </main>
+    <footer class="site-footer">
+      <span class="footer-copy">&#169; <span id="footerYear"></span> Mavilla Bharadwaja</span>
+      <span class="footer-right">
+        <a href="mailto:bharadwaja1557@gmail.com">mail</a>
+        <a href="https://github.com/mb1557" target="_blank" rel="noopener">github</a>
+        <a href="https://linkedin.com/in/bharadwaja1557/" target="_blank" rel="noopener">linkedin</a>
+      </span>
+    </footer>
   </div>
-
 </div>
-
 <script src="../js/theme.js"></script>
 <script src="../js/mobile-nav.js"></script>
 <script src="../js/blog-shell.js"></script>

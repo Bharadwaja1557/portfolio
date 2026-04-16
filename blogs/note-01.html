@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Building Production-Ready APIs with FastAPI — MB</title>
+  <title>Softmax temperature controls sharpness, not magnitude — MB</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d' rx='4'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='%2382aaff'>MB</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -29,62 +29,75 @@
   <div class="main-area">
     <header class="navbar">
       <div class="navbar-left">
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-        <span class="navbar-page">./logs/blog-03</span>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="navbar-page">./logs/note-01</span>
       </div>
       <button class="theme-toggle" id="themeToggle">[ light ]</button>
     </header>
     <main class="page-content">
       <a class="back-nav" href="../index.html#logs"><span class="back-arrow">&#x2190;</span> logs</a>
       <div class="post-meta">
-        <span class="post-date">Jan 2025</span>
-        <span class="post-badge">Dev</span>
+        <span class="post-date">Feb 2025</span>
+        <span class="post-badge post-type-note">note</span>
+        <span class="post-badge">ML</span>
         <button class="reader-toggle">reader mode</button>
       </div>
-      <div class="term-cmd"><span class="term-prompt">$</span><span class="term-text">cat blog-03.md</span></div>
-      <h1 class="post-title">Building Production-Ready APIs with FastAPI</h1>
+      <div class="term-cmd">
+        <span class="term-prompt">$</span>
+        <span class="term-text">cat note-01.md</span>
+      </div>
+      <h1 class="post-title">Softmax temperature controls sharpness, not magnitude</h1>
       <div class="post-divider"></div>
-      <article class="post-body"><p>FastAPI is my default choice for Python APIs. Type-annotation-based validation via Pydantic catches errors at the schema level. Here are the patterns I have settled on after shipping real projects.</p>
-<h2>Project structure that scales</h2>
-<pre><code>app/
-├── main.py          # App creation, middleware, routers
-├── api/v1/
-│   ├── routes/      # One file per domain
-│   └── deps.py      # Shared dependencies
-├── core/
-│   ├── config.py    # pydantic-settings
-│   └── security.py
-├── models/          # SQLAlchemy ORM
-├── schemas/         # Pydantic request/response
-└── services/        # Business logic</code></pre>
-<p>Keep routes thin — validate input, call a service, return a schema.</p>
-<h2>Configuration with pydantic-settings</h2>
-<pre><code>from pydantic_settings import BaseSettings
+      <article class="post-body">
 
-class Settings(BaseSettings):
-    DATABASE_URL: str
-    SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+        <p>
+          The temperature parameter <code>τ</code> in <code>softmax(x / τ)</code> is one of those
+          things that looks trivial until you actually need to tune it. Quick note on what it does
+          and where it matters.
+        </p>
 
-    class Config:
-        env_file = ".env"
+        <h2>What temperature does</h2>
 
-settings = Settings()</code></pre>
-<h2>Async where it matters</h2>
-<p>Use <code>async def</code> for I/O-bound routes. For CPU-bound work (like running an ML model) use <code>def</code> — FastAPI runs it in a thread pool automatically.</p>
-<h2>Error handling</h2>
-<pre><code>@app.exception_handler(ValueError)
-async def value_error_handler(request, exc):
-    return JSONResponse(status_code=422, content={"detail": str(exc)})</code></pre>
-<p>Register custom exception handlers at app level. Routes stay clean, error responses stay consistent.</p>
-<blockquote><p>The schema is the contract. Define it precisely and let Pydantic enforce it.</p></blockquote>
-<h2>Quick wins</h2>
-<ul>
-<li>Use <code>APIRouter</code> with <code>prefix</code> and <code>tags</code> to group related routes.</li>
-<li>Use <code>Depends()</code> for DB sessions — handles cleanup on success and error.</li>
-<li>Set <code>response_model</code> explicitly on every route.</li>
-<li>Add <code>lifespan</code> context for startup/shutdown (DB pool, model loading).</li>
-</ul></article>
+        <p>
+          Softmax always outputs a probability distribution summing to 1. Temperature does not
+          change that — it changes how <em>peaked</em> or <em>flat</em> the distribution is:
+        </p>
+
+        <ul>
+          <li><strong>τ &lt; 1</strong> — sharpens the distribution (model becomes more confident, greedy)</li>
+          <li><strong>τ = 1</strong> — standard softmax, no change</li>
+          <li><strong>τ &gt; 1</strong> — flattens the distribution (model becomes less confident, more random)</li>
+        </ul>
+
+        <pre><code>import numpy as np
+
+def softmax_temp(x, tau):
+    e = np.exp((x - x.max()) / tau)
+    return e / e.sum()
+
+logits = np.array([2.0, 1.0, 0.1])
+
+print(softmax_temp(logits, tau=0.5))  # sharper: [0.844, 0.143, 0.013]
+print(softmax_temp(logits, tau=1.0))  # normal:  [0.659, 0.242, 0.099]
+print(softmax_temp(logits, tau=2.0))  # flatter: [0.507, 0.333, 0.160]</code></pre>
+
+        <h2>Where this matters</h2>
+
+        <p><strong>LLM sampling:</strong> when you set temperature in a chat model, you are literally
+        dividing the logits before softmax. Low temperature → the model almost always picks its
+        top token. High temperature → more surprising outputs.</p>
+
+        <p><strong>Knowledge distillation:</strong> the teacher's soft labels carry more information
+        at higher temperatures because the small probabilities on non-target classes become more
+        visible. This is the key insight from Hinton et al.'s original distillation paper.</p>
+
+        <blockquote>
+          <p>Temperature is a knob on <em>how decisive</em> the model is, not on how smart it is.</p>
+        </blockquote>
+
+      </article>
     </main>
     <footer class="site-footer">
       <span class="footer-copy">&#169; <span id="footerYear"></span> Mavilla Bharadwaja</span>
@@ -99,4 +112,5 @@ async def value_error_handler(request, exc):
 <script src="../js/theme.js"></script>
 <script src="../js/mobile-nav.js"></script>
 <script src="../js/blog-shell.js"></script>
-</body></html>
+</body>
+</html>
